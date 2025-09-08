@@ -23,7 +23,4 @@ LMS Platform is a comprehensive Learning Management System designed to streamlin
 ## Preview
 
 ![LMS Platform Preview](./Preview.gif)
-
-## Getting Started
-
-See [docs/SETUP.md](docs/SETUP.md) for installation and usage instructions.
+.
