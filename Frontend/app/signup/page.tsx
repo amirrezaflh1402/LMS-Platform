@@ -1,50 +1,69 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export default function SignupPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match")
-      return
+      alert("Passwords do not match");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
-    // Mock signup - simulate API call
-    setTimeout(() => {
-      // Store mock user data
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: Math.random().toString(36).substr(2, 9),
-          name: name,
-          email: email,
-          role: "student",
+    try {
+      const res = await fetch("http://localhost:8080/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
         }),
-      )
-      setIsLoading(false)
-      router.push("/dashboard")
-    }, 1000)
-  }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        alert(errorData.message || "Signup failed");
+        setIsLoading(false);
+        return;
+      }
+
+      const userData = await res.json();
+      localStorage.setItem("token", userData.token);
+      setIsLoading(false);
+      router.push("/dashboard");
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleSignup = () => {
     // Mock Google signup
@@ -55,10 +74,10 @@ export default function SignupPage() {
         name: "Google User",
         email: "user@gmail.com",
         role: "student",
-      }),
-    )
-    router.push("/dashboard")
-  }
+      })
+    );
+    router.push("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -66,7 +85,9 @@ export default function SignupPage() {
         <CardHeader className="text-center">
           <div className="mx-auto h-12 w-12 rounded-lg bg-primary mb-4"></div>
           <CardTitle className="text-2xl">Create your account</CardTitle>
-          <CardDescription>Join LearnHub and start learning today</CardDescription>
+          <CardDescription>
+            Join LearnHub and start learning today
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSignup} className="space-y-4">
@@ -124,11 +145,17 @@ export default function SignupPage() {
               <Separator />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
 
-          <Button variant="outline" className="w-full bg-transparent" onClick={handleGoogleSignup}>
+          <Button
+            variant="outline"
+            className="w-full bg-transparent"
+            onClick={handleGoogleSignup}
+          >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -151,7 +178,9 @@ export default function SignupPage() {
           </Button>
 
           <div className="text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
+            <span className="text-muted-foreground">
+              Already have an account?{" "}
+            </span>
             <Link href="/login" className="text-primary hover:underline">
               Sign in
             </Link>
@@ -159,5 +188,5 @@ export default function SignupPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

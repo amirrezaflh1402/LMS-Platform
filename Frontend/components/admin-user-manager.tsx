@@ -1,39 +1,105 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { mockUsers, type User } from "@/lib/mock-data"
-import { Search, UserCheck, UserX, Shield, UserIcon } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {  type User } from "@/lib/mock-data";
+import { Search, UserCheck, UserX, Shield, UserIcon } from "lucide-react";
 
 export function AdminUserManager() {
-  const [users, setUsers] = useState<User[]>(mockUsers)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [roleFilter, setRoleFilter] = useState("all")
+  const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = roleFilter === "all" || user.role === roleFilter
-    return matchesSearch && matchesRole
-  })
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   const handleRoleChange = (userId: string, newRole: "student" | "admin") => {
-    setUsers(users.map((user) => (user.id === userId ? { ...user, role: newRole } : user)))
-  }
+    fetch(`http://localhost:8080/api/users/${userId}/role`, {
+      method: "PUT",
+      headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({ role: newRole }),
+    })
+      .then((res) => {
+      if (!res.ok) throw new Error("Failed to update user role");
+      return res.json();
+      })
+      .then(() => {
+      setUsers(
+        users.map((user) =>
+        user._id === userId ? { ...user, role: newRole } : user
+        )
+      );
+      })
+      .catch((err) => {
+      console.error("Error updating user role:", err);
+      });
+  };
 
   const handleDeleteUser = (userId: string) => {
-    setUsers(users.filter((user) => user.id !== userId))
-  }
+    fetch(`http://localhost:8080/api/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => {
+      if (!res.ok) throw new Error("Failed to delete user");
+      setUsers(users.filter((user) => user._id !== userId));
+      })
+      .catch((err) => {
+      console.error("Error deleting user:", err);
+      });
+  };
+  useEffect(() => {
+    fetch("http://localhost:8080/api/users", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data?.users);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch users list:", err);
+      });
+  }, []);
 
-  const totalStudents = users.filter((u) => u.role === "student").length
-  const totalAdmins = users.filter((u) => u.role === "admin").length
+  const totalStudents = users.filter((u) => u.role === "student").length;
+  const totalAdmins = users.filter((u) => u.role === "admin").length;
 
   return (
     <div className="space-y-6">
@@ -95,12 +161,16 @@ export function AdminUserManager() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Administrators</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Administrators
+            </CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAdmins}</div>
-            <p className="text-xs text-muted-foreground">{Math.round((totalAdmins / users.length) * 100)}% of users</p>
+            <p className="text-xs text-muted-foreground">
+              {Math.round((totalAdmins / users.length) * 100)}% of users
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -109,7 +179,9 @@ export function AdminUserManager() {
       <Card>
         <CardHeader>
           <CardTitle>All Users</CardTitle>
-          <CardDescription>Manage user accounts and permissions</CardDescription>
+          <CardDescription>
+            Manage user accounts and permissions
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -125,10 +197,10 @@ export function AdminUserManager() {
             </TableHeader>
             <TableBody>
               {filteredUsers.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user._id}>
                   <TableCell>
                     <div className="flex items-center space-x-3">
-                      <Avatar className="h-8 w-8">
+                      {/* <Avatar className="h-8 w-8">
                         <AvatarFallback className="text-xs">
                           {user.name
                             .split(" ")
@@ -136,13 +208,15 @@ export function AdminUserManager() {
                             .join("")
                             .toUpperCase()}
                         </AvatarFallback>
-                      </Avatar>
+                      </Avatar> */}
                       <span className="font-medium">{user.name}</span>
                     </div>
                   </TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    <Badge variant={user.role === "admin" ? "default" : "secondary"}>
+                    <Badge
+                      variant={user.role === "admin" ? "default" : "secondary"}
+                    >
                       {user.role === "admin" ? (
                         <>
                           <Shield className="h-3 w-3 mr-1" />
@@ -162,7 +236,9 @@ export function AdminUserManager() {
                     <div className="flex items-center space-x-2">
                       <Select
                         value={user.role}
-                        onValueChange={(value: "student" | "admin") => handleRoleChange(user.id, value)}
+                        onValueChange={(value: "student" | "admin") =>
+                          handleRoleChange(user._id, value)
+                        }
                       >
                         <SelectTrigger className="w-24 h-8">
                           <SelectValue />
@@ -172,7 +248,11 @@ export function AdminUserManager() {
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button size="sm" variant="outline" onClick={() => handleDeleteUser(user.id)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteUser(user._id)}
+                      >
                         <UserX className="h-3 w-3" />
                       </Button>
                     </div>
@@ -186,9 +266,11 @@ export function AdminUserManager() {
 
       {filteredUsers.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No users found matching your criteria.</p>
+          <p className="text-muted-foreground">
+            No users found matching your criteria.
+          </p>
         </div>
       )}
     </div>
-  )
+  );
 }

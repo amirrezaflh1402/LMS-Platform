@@ -7,7 +7,7 @@ import connectDB from "./config/db";
 // import swaggerUi from "swagger-ui-express";
 // import swaggerSpec from "./swagger";
 import publicRoutes from "./routes/publicRoutes";
-// import privateRoutes from "./routes/privateRoutes";
+import privateRoutes from "./routes/privateRoutes";
 
 dotenv.config();
 connectDB();
@@ -36,7 +36,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use("/api", publicRoutes);
 
 // Use private routes (Authenticated)
-// app.use("/api", privateRoutes);
+app.use("/api", privateRoutes);
 
 // Error handling middleware
 app.use(

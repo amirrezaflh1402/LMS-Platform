@@ -1,59 +1,109 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AdminCourseManager } from "@/components/admin-course-manager"
-import { AdminUserManager } from "@/components/admin-user-manager"
-import { mockCourses, mockUsers, type User } from "@/lib/mock-data"
-import { BookOpen, Users, TrendingUp, DollarSign, ArrowLeft } from "lucide-react"
-import { UserDropdown } from "@/components/user-dropdown"
-import { Breadcrumb } from "@/components/breadcrumb"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AdminCourseManager } from "@/components/admin-course-manager";
+import { AdminUserManager } from "@/components/admin-user-manager";
+import { mockCourses, type User } from "@/lib/mock-data";
+import {
+  BookOpen,
+  Users,
+  TrendingUp,
+  DollarSign,
+  ArrowLeft,
+} from "lucide-react";
+import { UserDropdown } from "@/components/user-dropdown";
+// import { Breadcrumb } from "@/components/breadcrumb"
 
 export default function AdminPage() {
-  const [user, setUser] = useState<User | null>(null)
-  const router = useRouter()
+  const [user, setUser] = useState<User | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<{
+    totalCourses: number;
+    totalUsers: number;
+    totalStudents: number;
+    totalRevenue: number;
+    averageEnrollment: number;
+  } >({
+    totalCourses: 0,
+    totalUsers: 0,
+    totalStudents: 0,
+    totalRevenue: 0,
+    averageEnrollment: 0,
+  });
+
+  const router = useRouter();
 
   useEffect(() => {
     // Get user data from localStorage
-    const userData = localStorage.getItem("user")
-    if (!userData) {
-      router.push("/login")
-      return
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
     }
 
-    const parsedUser = JSON.parse(userData)
-    if (parsedUser.role !== "admin") {
-      router.push("/dashboard")
-      return
+    let parsedUser = null;
+    if (token) {
+      try {
+        const payload = token.split(".")[1];
+        const decoded = JSON.parse(atob(payload));
+        parsedUser = decoded.user || decoded;
+      } catch (e) {
+        parsedUser = null;
+      }
+    }
+    if (parsedUser?.role !== "admin") {
+      router.push("/dashboard");
+      return;
     }
 
-    setUser(parsedUser)
-  }, [router])
+    setUser(parsedUser);
+    fetch("http://localhost:8080/api/dashboard-stats", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setDashboardStats(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch dashboard stats:", err);
+      });
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    router.push("/")
-  }
+    localStorage.removeItem("user");
+    router.push("/");
+  };
 
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
       </div>
-    )
+    );
   }
 
   // Calculate statistics
-  const totalCourses = mockCourses.length
-  const totalUsers = mockUsers.length
-  const totalStudents = mockUsers.filter((u) => u.role === "student").length
-  const totalRevenue = mockCourses.reduce((acc, course) => acc + course.price * course.enrolledStudents, 0)
+  const {
+    averageEnrollment,
+    totalCourses,
+    totalUsers,
+    totalStudents,
+    totalRevenue,
+  } = dashboardStats;
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +116,9 @@ export default function AdminPage() {
                 <div className="h-6 w-6 md:h-8 md:w-8 rounded-lg bg-primary flex items-center justify-center">
                   <BookOpen className="h-3 w-3 md:h-5 md:w-5 text-primary-foreground" />
                 </div>
-                <h1 className="text-lg md:text-xl font-bold text-foreground">LearnHub Admin</h1>
+                <h1 className="text-lg md:text-xl font-bold text-foreground">
+                  LearnHub Admin
+                </h1>
               </Link>
               <Badge variant="secondary" className="text-xs">
                 Admin Panel
@@ -74,7 +126,11 @@ export default function AdminPage() {
             </div>
             <div className="flex items-center space-x-2 md:space-x-4">
               <Link href="/dashboard" className="hidden sm:block">
-                <Button variant="outline" size="sm" className="text-xs md:text-sm bg-transparent">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs md:text-sm bg-transparent"
+                >
                   <ArrowLeft className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
                   <span className="hidden md:inline">Back to Dashboard</span>
                   <span className="md:hidden">Back</span>
@@ -85,13 +141,13 @@ export default function AdminPage() {
           </div>
         </div>
       </header>
-
-      <Breadcrumb />
+      {/* 
+      <Breadcrumb /> */}
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Welcome Section */}
         <div className="flex items-center space-x-4 mb-6 md:mb-8">
-          <Avatar className="h-12 w-12 md:h-16 md:w-16">
+          {/* <Avatar className="h-12 w-12 md:h-16 md:w-16">
             <AvatarFallback className="text-sm md:text-lg font-semibold bg-primary text-primary-foreground">
               {user.name
                 .split(" ")
@@ -99,10 +155,14 @@ export default function AdminPage() {
                 .join("")
                 .toUpperCase()}
             </AvatarFallback>
-          </Avatar>
+          </Avatar> */}
           <div>
-            <h1 className="text-xl md:text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-sm md:text-base text-muted-foreground">Manage courses, users, and platform analytics</p>
+            <h1 className="text-xl md:text-3xl font-bold text-foreground">
+              Admin Dashboard
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Manage courses, users, and platform analytics
+            </p>
           </div>
         </div>
 
@@ -110,18 +170,24 @@ export default function AdminPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Courses</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Total Courses
+              </CardTitle>
               <BookOpen className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-lg md:text-2xl font-bold">{totalCourses}</div>
+              <div className="text-lg md:text-2xl font-bold">
+                {totalCourses}
+              </div>
               <p className="text-xs text-muted-foreground">Active courses</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Total Users
+              </CardTitle>
               <Users className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -134,25 +200,35 @@ export default function AdminPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium">Total Revenue</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Total Revenue
+              </CardTitle>
               <DollarSign className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-lg md:text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">From course enrollments</p>
+              <div className="text-lg md:text-2xl font-bold">
+                ${totalRevenue}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                From course enrollments
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs md:text-sm font-medium">Avg. Enrollment</CardTitle>
+              <CardTitle className="text-xs md:text-sm font-medium">
+                Avg. Enrollment
+              </CardTitle>
               <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-lg md:text-2xl font-bold">
-                {Math.round(mockCourses.reduce((acc, course) => acc + course.enrolledStudents, 0) / totalCourses)}
+                {Math.round(averageEnrollment)}
               </div>
-              <p className="text-xs text-muted-foreground">Students per course</p>
+              <p className="text-xs text-muted-foreground">
+                Students per course
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -186,7 +262,9 @@ export default function AdminPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Course Performance</CardTitle>
-                  <CardDescription>Most popular courses by enrollment</CardDescription>
+                  <CardDescription>
+                    Most popular courses by enrollment
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -194,12 +272,19 @@ export default function AdminPage() {
                       .sort((a, b) => b.enrolledStudents - a.enrolledStudents)
                       .slice(0, 5)
                       .map((course, index) => (
-                        <div key={course.id} className="flex items-center justify-between">
+                        <div
+                          key={course.id}
+                          className="flex items-center justify-between"
+                        >
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              #{index + 1}
+                            </span>
                             <span className="text-sm">{course.title}</span>
                           </div>
-                          <Badge variant="secondary">{course.enrolledStudents} students</Badge>
+                          <Badge variant="secondary">
+                            {course.enrolledStudents} students
+                          </Badge>
                         </div>
                       ))}
                   </div>
@@ -214,16 +299,28 @@ export default function AdminPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {mockCourses
-                      .sort((a, b) => b.price * b.enrolledStudents - a.price * a.enrolledStudents)
+                      .sort(
+                        (a, b) =>
+                          b.price * b.enrolledStudents -
+                          a.price * a.enrolledStudents
+                      )
                       .slice(0, 5)
                       .map((course, index) => (
-                        <div key={course.id} className="flex items-center justify-between">
+                        <div
+                          key={course.id}
+                          className="flex items-center justify-between"
+                        >
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              #{index + 1}
+                            </span>
                             <span className="text-sm">{course.title}</span>
                           </div>
                           <Badge variant="secondary">
-                            ${(course.price * course.enrolledStudents).toLocaleString()}
+                            $
+                            {(
+                              course.price * course.enrolledStudents
+                            ).toLocaleString()}
                           </Badge>
                         </div>
                       ))}
@@ -235,5 +332,5 @@ export default function AdminPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

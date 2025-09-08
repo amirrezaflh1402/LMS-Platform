@@ -1,72 +1,81 @@
 export interface User {
-  id: string
-  name: string
-  email: string
-  role: "student" | "admin"
-  enrolledCourses?: string[]
-  completedLessons?: string[]
+  _id: string;
+  name: string;
+  email: string;
+  role: "student" | "admin";
+  enrolledCourses?: string[];
+  completedLessons?: string[];
+  createdAt?: string;
 }
 
 export interface Course {
-  id: string
-  title: string
-  description: string
-  instructor: string
-  thumbnail: string
-  duration: string
-  level: "Beginner" | "Intermediate" | "Advanced"
-  price: number
-  lessons: Lesson[]
-  enrolledStudents: number
+  id: string;
+  title: string;
+  description: string;
+  instructor: string;
+  thumbnail: string;
+  duration: string;
+  level: "Beginner" | "Intermediate" | "Advanced";
+  price: number;
+  lessons: Lesson[];
+  enrolledStudents: number;
+}
+export interface UserStats {
+  enrolledCoursesCount: number;
+  completedLessonsCount: number;
+  totalLessons: number;
+  overallProgress: number;
+  learningTime: number;
 }
 
 export interface Lesson {
-  id: string
-  title: string
-  description: string
-  duration: string
-  videoUrl: string
-  order: number
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  videoUrl: string;
+  order: number;
 }
 
 export interface ProgressEntry {
-  lessonId: string
-  completedAt: string
-  timeSpent: number // in minutes
-  progress: number // percentage
+  lessonId: string;
+  completedAt: string;
+  timeSpent: number; // in minutes
+  progress: number; // percentage
 }
 
 export interface LearningSession {
-  id: string
-  userId: string
-  courseId: string
-  lessonId: string
-  startTime: string
-  endTime: string
-  timeSpent: number // in minutes
-  completed: boolean
+  id: string;
+  userId: string;
+  courseId: string;
+  lessonId: string;
+  startTime: string;
+  endTime: string;
+  timeSpent: number; // in minutes
+  completed: boolean;
 }
 
 export interface Quiz {
-  id: string
-  lessonId: string
-  title: string
-  questions: QuizQuestion[]
+  id: string;
+  lessonId: string;
+  title: string;
+  questions: QuizQuestion[];
 }
 
 export interface QuizQuestion {
-  id: string
-  question: string
-  options: string[]
-  correctAnswer: number
-  explanation?: string
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation?: string;
 }
 
 export const mockCourses: Course[] = [
   {
     id: "1",
     title: "React Fundamentals",
-    description: "Learn the basics of React including components, props, state, and hooks.",
+    description:
+      "Learn the basics of React including components, props, state, and hooks.",
     instructor: "Sarah Johnson",
     thumbnail: "/react-programming-course-thumbnail.jpg",
     duration: "8 hours",
@@ -111,7 +120,8 @@ export const mockCourses: Course[] = [
   {
     id: "2",
     title: "Advanced JavaScript",
-    description: "Master advanced JavaScript concepts including closures, promises, and async/await.",
+    description:
+      "Master advanced JavaScript concepts including closures, promises, and async/await.",
     instructor: "Mike Chen",
     thumbnail: "/javascript-programming-course-thumbnail.jpg",
     duration: "12 hours",
@@ -148,7 +158,8 @@ export const mockCourses: Course[] = [
   {
     id: "3",
     title: "UI/UX Design Principles",
-    description: "Learn the fundamentals of user interface and user experience design.",
+    description:
+      "Learn the fundamentals of user interface and user experience design.",
     instructor: "Emily Rodriguez",
     thumbnail: "/ui-ux-design-course-thumbnail.jpg",
     duration: "6 hours",
@@ -182,42 +193,42 @@ export const mockCourses: Course[] = [
       },
     ],
   },
-]
+];
 
-export const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "student",
-    enrolledCourses: ["1", "3"],
-    completedLessons: ["1-1", "1-2", "3-1"],
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "admin",
-    enrolledCourses: [],
-    completedLessons: [],
-  },
-  {
-    id: "admin",
-    name: "Admin User",
-    email: "admin@admin.com",
-    role: "admin",
-    enrolledCourses: [],
-    completedLessons: [],
-  },
-  {
-    id: "3",
-    name: "Bob Wilson",
-    email: "bob@example.com",
-    role: "student",
-    enrolledCourses: ["2"],
-    completedLessons: ["2-1"],
-  },
-]
+// export const mockUsers: User[] = [
+//   {
+//     id: "1",
+//     name: "John Doe",
+//     email: "john@example.com",
+//     role: "student",
+//     enrolledCourses: ["1", "3"],
+//     completedLessons: ["1-1", "1-2", "3-1"],
+//   },
+//   {
+//     id: "2",
+//     name: "Jane Smith",
+//     email: "jane@example.com",
+//     role: "admin",
+//     enrolledCourses: [],
+//     completedLessons: [],
+//   },
+//   {
+//     id: "admin",
+//     name: "Admin User",
+//     email: "admin@admin.com",
+//     role: "admin",
+//     enrolledCourses: [],
+//     completedLessons: [],
+//   },
+//   {
+//     id: "3",
+//     name: "Bob Wilson",
+//     email: "bob@example.com",
+//     role: "student",
+//     enrolledCourses: ["2"],
+//     completedLessons: ["2-1"],
+//   },
+// ];
 
 export const mockProgressData: ProgressEntry[] = [
   {
@@ -238,7 +249,7 @@ export const mockProgressData: ProgressEntry[] = [
     timeSpent: 22,
     progress: 100,
   },
-]
+];
 
 export const mockLearningSessions: LearningSession[] = [
   {
@@ -261,7 +272,7 @@ export const mockLearningSessions: LearningSession[] = [
     timeSpent: 25,
     completed: true,
   },
-]
+];
 
 export const mockQuizzes: Quiz[] = [
   {
@@ -285,9 +296,15 @@ export const mockQuizzes: Quiz[] = [
       {
         id: "q2",
         question: "What does JSX stand for?",
-        options: ["JavaScript XML", "Java Syntax Extension", "JSON XML", "JavaScript Extension"],
+        options: [
+          "JavaScript XML",
+          "Java Syntax Extension",
+          "JSON XML",
+          "JavaScript Extension",
+        ],
         correctAnswer: 0,
-        explanation: "JSX stands for JavaScript XML and allows you to write HTML-like syntax in JavaScript.",
+        explanation:
+          "JSX stands for JavaScript XML and allows you to write HTML-like syntax in JavaScript.",
       },
       {
         id: "q3",
@@ -299,7 +316,8 @@ export const mockQuizzes: Quiz[] = [
           "React.component('MyComponent', () => <div>Hello</div>);",
         ],
         correctAnswer: 0,
-        explanation: "Functional components are created using regular JavaScript functions that return JSX.",
+        explanation:
+          "Functional components are created using regular JavaScript functions that return JSX.",
       },
       {
         id: "q4",
@@ -311,7 +329,8 @@ export const mockQuizzes: Quiz[] = [
           "To create class components",
         ],
         correctAnswer: 0,
-        explanation: "useState is a React hook that allows you to add state to functional components.",
+        explanation:
+          "useState is a React hook that allows you to add state to functional components.",
       },
     ],
   },
@@ -381,4 +400,4 @@ export const mockQuizzes: Quiz[] = [
       },
     ],
   },
-]
+];

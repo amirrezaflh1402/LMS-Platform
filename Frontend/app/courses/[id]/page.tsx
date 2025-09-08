@@ -27,8 +27,10 @@ export default function CoursePage() {
 
   useEffect(() => {
     // Get course data
-    const foundCourse = mockCourses.find((c) => c.id === params.id)
-    setCourse(foundCourse || null)
+    fetch(`/api/courses/${params.id}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => setCourse(data))
+      .catch(() => setCourse(null))
 
     // Get user data from localStorage
     const userData = localStorage.getItem("user")
@@ -125,7 +127,7 @@ export default function CoursePage() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <Breadcrumb />
+        {/* <Breadcrumb /> */}
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Course Info */}

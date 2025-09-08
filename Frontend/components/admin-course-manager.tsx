@@ -1,16 +1,25 @@
-"use client"
-
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
+import type React from "react";
+import { useState,useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -18,16 +27,32 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { mockCourses, type Course, type Lesson } from "@/lib/mock-data"
-import { Plus, Edit, Trash2, Users, DollarSign, Video, HelpCircle, X } from "lucide-react"
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { mockCourses, type Course, type Lesson } from "@/lib/mock-data";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Users,
+  DollarSign,
+  Video,
+  HelpCircle,
+  X,
+} from "lucide-react";
 
 export function AdminCourseManager() {
-  const [courses, setCourses] = useState<Course[]>(mockCourses)
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [newCourse, setNewCourse] = useState({
     title: "",
     description: "",
@@ -37,7 +62,7 @@ export function AdminCourseManager() {
     duration: "",
     thumbnail: "",
     lessons: [] as Lesson[],
-  })
+  });
 
   const [newLesson, setNewLesson] = useState({
     title: "",
@@ -45,7 +70,7 @@ export function AdminCourseManager() {
     duration: "",
     videoUrl: "",
     type: "video" as "video" | "quiz",
-  })
+  });
 
   const [newQuiz, setNewQuiz] = useState({
     questions: [
@@ -56,7 +81,7 @@ export function AdminCourseManager() {
         explanation: "",
       },
     ],
-  })
+  });
 
   const handleAddCourse = () => {
     const course: Course = {
@@ -64,8 +89,8 @@ export function AdminCourseManager() {
       ...newCourse,
       thumbnail: newCourse.thumbnail || "/online-learning-platform.png",
       enrolledStudents: 0,
-    }
-    setCourses([...courses, course])
+    };
+    setCourses([...courses, course]);
     setNewCourse({
       title: "",
       description: "",
@@ -75,9 +100,9 @@ export function AdminCourseManager() {
       duration: "",
       thumbnail: "",
       lessons: [],
-    })
-    setIsAddDialogOpen(false)
-  }
+    });
+    setIsAddDialogOpen(false);
+  };
 
   const handleAddQuizQuestion = () => {
     setNewQuiz({
@@ -90,26 +115,33 @@ export function AdminCourseManager() {
           explanation: "",
         },
       ],
-    })
-  }
+    });
+  };
 
   const handleRemoveQuizQuestion = (index: number) => {
     if (newQuiz.questions.length > 1) {
       setNewQuiz({
         questions: newQuiz.questions.filter((_, i) => i !== index),
-      })
+      });
     }
-  }
+  };
 
-  const handleUpdateQuizQuestion = (questionIndex: number, field: string, value: any) => {
-    const updatedQuestions = [...newQuiz.questions]
+  const handleUpdateQuizQuestion = (
+    questionIndex: number,
+    field: string,
+    value: any
+  ) => {
+    const updatedQuestions = [...newQuiz.questions];
     if (field === "options") {
-      updatedQuestions[questionIndex].options = value
+      updatedQuestions[questionIndex].options = value;
     } else {
-      updatedQuestions[questionIndex] = { ...updatedQuestions[questionIndex], [field]: value }
+      updatedQuestions[questionIndex] = {
+        ...updatedQuestions[questionIndex],
+        [field]: value,
+      };
     }
-    setNewQuiz({ questions: updatedQuestions })
-  }
+    setNewQuiz({ questions: updatedQuestions });
+  };
 
   const handleAddLesson = () => {
     if (newLesson.type === "video") {
@@ -120,8 +152,8 @@ export function AdminCourseManager() {
         duration: newLesson.duration,
         videoUrl: newLesson.videoUrl,
         type: "video",
-      }
-      setNewCourse({ ...newCourse, lessons: [...newCourse.lessons, lesson] })
+      };
+      setNewCourse({ ...newCourse, lessons: [...newCourse.lessons, lesson] });
     } else {
       const quizLesson: Lesson = {
         id: Math.random().toString(36).substr(2, 9),
@@ -138,8 +170,11 @@ export function AdminCourseManager() {
             explanation: q.explanation,
           })),
         },
-      }
-      setNewCourse({ ...newCourse, lessons: [...newCourse.lessons, quizLesson] })
+      };
+      setNewCourse({
+        ...newCourse,
+        lessons: [...newCourse.lessons, quizLesson],
+      });
     }
 
     setNewLesson({
@@ -148,7 +183,7 @@ export function AdminCourseManager() {
       duration: "",
       videoUrl: "",
       type: "video",
-    })
+    });
     setNewQuiz({
       questions: [
         {
@@ -158,18 +193,18 @@ export function AdminCourseManager() {
           explanation: "",
         },
       ],
-    })
-  }
+    });
+  };
 
   const handleRemoveLesson = (lessonId: string) => {
     setNewCourse({
       ...newCourse,
       lessons: newCourse.lessons.filter((lesson) => lesson.id !== lessonId),
-    })
-  }
+    });
+  };
 
   const handleEditCourse = (course: Course) => {
-    setEditingCourse(course)
+    setEditingCourse(course);
     setNewCourse({
       title: course.title,
       description: course.description,
@@ -179,17 +214,17 @@ export function AdminCourseManager() {
       duration: course.duration,
       thumbnail: course.thumbnail || "",
       lessons: course.lessons || [],
-    })
-  }
+    });
+  };
 
   const handleUpdateCourse = () => {
-    if (!editingCourse) return
+    if (!editingCourse) return;
 
     const updatedCourses = courses.map((course) =>
-      course.id === editingCourse.id ? { ...course, ...newCourse } : course,
-    )
-    setCourses(updatedCourses)
-    setEditingCourse(null)
+      course.id === editingCourse.id ? { ...course, ...newCourse } : course
+    );
+    setCourses(updatedCourses);
+    setEditingCourse(null);
     setNewCourse({
       title: "",
       description: "",
@@ -199,21 +234,36 @@ export function AdminCourseManager() {
       duration: "",
       thumbnail: "",
       lessons: [],
-    })
-  }
+    });
+  };
 
   const handleDeleteCourse = (courseId: string) => {
-    setCourses(courses.filter((course) => course.id !== courseId))
-  }
+    setCourses(courses.filter((course) => course.id !== courseId));
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (file) {
       // In a real app, you would upload to a service like Vercel Blob
-      const imageUrl = URL.createObjectURL(file)
-      setNewCourse({ ...newCourse, thumbnail: imageUrl })
+      const imageUrl = URL.createObjectURL(file);
+      setNewCourse({ ...newCourse, thumbnail: imageUrl });
     }
-  }
+  };
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/courses-list", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setCourses(data?.courseList);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch dashboard stats:", err);
+      });
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -229,7 +279,9 @@ export function AdminCourseManager() {
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg md:text-xl">Add New Course</DialogTitle>
+              <DialogTitle className="text-lg md:text-xl">
+                Add New Course
+              </DialogTitle>
               <DialogDescription className="text-sm md:text-base">
                 Create a new course with lessons and quizzes
               </DialogDescription>
@@ -258,19 +310,29 @@ export function AdminCourseManager() {
                       <Input
                         id="title"
                         value={newCourse.title}
-                        onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+                        onChange={(e) =>
+                          setNewCourse({ ...newCourse, title: e.target.value })
+                        }
                         placeholder="Enter course title"
                         className="text-sm md:text-base"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="instructor" className="text-sm md:text-base">
+                      <Label
+                        htmlFor="instructor"
+                        className="text-sm md:text-base"
+                      >
                         Instructor
                       </Label>
                       <Input
                         id="instructor"
                         value={newCourse.instructor}
-                        onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
+                        onChange={(e) =>
+                          setNewCourse({
+                            ...newCourse,
+                            instructor: e.target.value,
+                          })
+                        }
                         placeholder="Enter instructor name"
                         className="text-sm md:text-base"
                       />
@@ -302,18 +364,27 @@ export function AdminCourseManager() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Upload a banner image for your course (recommended: 1200x600px)
+                      Upload a banner image for your course (recommended:
+                      1200x600px)
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-sm md:text-base">
+                    <Label
+                      htmlFor="description"
+                      className="text-sm md:text-base"
+                    >
                       Description
                     </Label>
                     <Textarea
                       id="description"
                       value={newCourse.description}
-                      onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+                      onChange={(e) =>
+                        setNewCourse({
+                          ...newCourse,
+                          description: e.target.value,
+                        })
+                      }
                       placeholder="Enter course description"
                       rows={3}
                       className="text-sm md:text-base"
@@ -326,14 +397,18 @@ export function AdminCourseManager() {
                       </Label>
                       <Select
                         value={newCourse.level}
-                        onValueChange={(value: any) => setNewCourse({ ...newCourse, level: value })}
+                        onValueChange={(value: any) =>
+                          setNewCourse({ ...newCourse, level: value })
+                        }
                       >
                         <SelectTrigger className="text-sm md:text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Beginner">Beginner</SelectItem>
-                          <SelectItem value="Intermediate">Intermediate</SelectItem>
+                          <SelectItem value="Intermediate">
+                            Intermediate
+                          </SelectItem>
                           <SelectItem value="Advanced">Advanced</SelectItem>
                         </SelectContent>
                       </Select>
@@ -346,19 +421,32 @@ export function AdminCourseManager() {
                         id="price"
                         type="number"
                         value={newCourse.price}
-                        onChange={(e) => setNewCourse({ ...newCourse, price: Number(e.target.value) })}
+                        onChange={(e) =>
+                          setNewCourse({
+                            ...newCourse,
+                            price: Number(e.target.value),
+                          })
+                        }
                         placeholder="0"
                         className="text-sm md:text-base"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="duration" className="text-sm md:text-base">
+                      <Label
+                        htmlFor="duration"
+                        className="text-sm md:text-base"
+                      >
                         Duration
                       </Label>
                       <Input
                         id="duration"
                         value={newCourse.duration}
-                        onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
+                        onChange={(e) =>
+                          setNewCourse({
+                            ...newCourse,
+                            duration: e.target.value,
+                          })
+                        }
                         placeholder="e.g., 8 hours"
                         className="text-sm md:text-base"
                       />
@@ -370,23 +458,38 @@ export function AdminCourseManager() {
               <TabsContent value="lessons" className="space-y-4">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base md:text-lg font-semibold">Course Lessons</h3>
+                    <h3 className="text-base md:text-lg font-semibold">
+                      Course Lessons
+                    </h3>
                     <div className="flex items-center space-x-3">
                       <div className="flex items-center space-x-2">
                         <Video
-                          className={`h-4 w-4 ${newLesson.type === "video" ? "text-blue-500" : "text-gray-400"}`}
+                          className={`h-4 w-4 ${
+                            newLesson.type === "video"
+                              ? "text-blue-500"
+                              : "text-gray-400"
+                          }`}
                         />
                         <Switch
                           checked={newLesson.type === "quiz"}
                           onCheckedChange={(checked) =>
-                            setNewLesson({ ...newLesson, type: checked ? "quiz" : "video" })
+                            setNewLesson({
+                              ...newLesson,
+                              type: checked ? "quiz" : "video",
+                            })
                           }
                         />
                         <HelpCircle
-                          className={`h-4 w-4 ${newLesson.type === "quiz" ? "text-blue-500" : "text-gray-400"}`}
+                          className={`h-4 w-4 ${
+                            newLesson.type === "quiz"
+                              ? "text-blue-500"
+                              : "text-gray-400"
+                          }`}
                         />
                       </div>
-                      <span className="text-sm font-medium">{newLesson.type === "video" ? "Video" : "Quiz"}</span>
+                      <span className="text-sm font-medium">
+                        {newLesson.type === "video" ? "Video" : "Quiz"}
+                      </span>
                     </div>
                   </div>
 
@@ -398,26 +501,43 @@ export function AdminCourseManager() {
                         ) : (
                           <HelpCircle className="h-4 w-4 mr-2 text-blue-500" />
                         )}
-                        Add {newLesson.type === "video" ? "Video Lesson" : "Quiz Lesson"}
+                        Add{" "}
+                        {newLesson.type === "video"
+                          ? "Video Lesson"
+                          : "Quiz Lesson"}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-sm md:text-base">Lesson Title</Label>
+                          <Label className="text-sm md:text-base">
+                            Lesson Title
+                          </Label>
                           <Input
                             value={newLesson.title}
-                            onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value })}
+                            onChange={(e) =>
+                              setNewLesson({
+                                ...newLesson,
+                                title: e.target.value,
+                              })
+                            }
                             placeholder="Enter lesson title"
                             className="text-sm md:text-base"
                           />
                         </div>
                         {newLesson.type === "video" && (
                           <div className="space-y-2">
-                            <Label className="text-sm md:text-base">Duration</Label>
+                            <Label className="text-sm md:text-base">
+                              Duration
+                            </Label>
                             <Input
                               value={newLesson.duration}
-                              onChange={(e) => setNewLesson({ ...newLesson, duration: e.target.value })}
+                              onChange={(e) =>
+                                setNewLesson({
+                                  ...newLesson,
+                                  duration: e.target.value,
+                                })
+                              }
                               placeholder="e.g., 15 minutes"
                               className="text-sm md:text-base"
                             />
@@ -426,10 +546,17 @@ export function AdminCourseManager() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-sm md:text-base">Description</Label>
+                        <Label className="text-sm md:text-base">
+                          Description
+                        </Label>
                         <Textarea
                           value={newLesson.description}
-                          onChange={(e) => setNewLesson({ ...newLesson, description: e.target.value })}
+                          onChange={(e) =>
+                            setNewLesson({
+                              ...newLesson,
+                              description: e.target.value,
+                            })
+                          }
                           placeholder="Enter lesson description"
                           rows={2}
                           className="text-sm md:text-base"
@@ -438,10 +565,17 @@ export function AdminCourseManager() {
 
                       {newLesson.type === "video" ? (
                         <div className="space-y-2">
-                          <Label className="text-sm md:text-base">Video URL</Label>
+                          <Label className="text-sm md:text-base">
+                            Video URL
+                          </Label>
                           <Input
                             value={newLesson.videoUrl}
-                            onChange={(e) => setNewLesson({ ...newLesson, videoUrl: e.target.value })}
+                            onChange={(e) =>
+                              setNewLesson({
+                                ...newLesson,
+                                videoUrl: e.target.value,
+                              })
+                            }
                             placeholder="Enter video URL or upload link"
                             className="text-sm md:text-base"
                           />
@@ -449,7 +583,9 @@ export function AdminCourseManager() {
                       ) : (
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <Label className="text-sm md:text-base">Quiz Questions</Label>
+                            <Label className="text-sm md:text-base">
+                              Quiz Questions
+                            </Label>
                             <Button
                               type="button"
                               variant="outline"
@@ -465,13 +601,17 @@ export function AdminCourseManager() {
                           {newQuiz.questions.map((question, questionIndex) => (
                             <Card key={questionIndex} className="p-4">
                               <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-medium">Question {questionIndex + 1}</h4>
+                                <h4 className="text-sm font-medium">
+                                  Question {questionIndex + 1}
+                                </h4>
                                 {newQuiz.questions.length > 1 && (
                                   <Button
                                     type="button"
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => handleRemoveQuizQuestion(questionIndex)}
+                                    onClick={() =>
+                                      handleRemoveQuizQuestion(questionIndex)
+                                    }
                                   >
                                     <X className="h-3 w-3" />
                                   </Button>
@@ -484,7 +624,11 @@ export function AdminCourseManager() {
                                   <Textarea
                                     value={question.question}
                                     onChange={(e) =>
-                                      handleUpdateQuizQuestion(questionIndex, "question", e.target.value)
+                                      handleUpdateQuizQuestion(
+                                        questionIndex,
+                                        "question",
+                                        e.target.value
+                                      )
                                     }
                                     placeholder="Enter quiz question"
                                     rows={2}
@@ -493,32 +637,57 @@ export function AdminCourseManager() {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label className="text-sm">Answer Options</Label>
-                                  {question.options.map((option, optionIndex) => (
-                                    <div key={optionIndex} className="flex items-center space-x-2">
-                                      <Input
-                                        value={option}
-                                        onChange={(e) => {
-                                          const newOptions = [...question.options]
-                                          newOptions[optionIndex] = e.target.value
-                                          handleUpdateQuizQuestion(questionIndex, "options", newOptions)
-                                        }}
-                                        placeholder={`Option ${optionIndex + 1}`}
-                                        className="text-sm"
-                                      />
-                                      <Button
-                                        type="button"
-                                        variant={question.correctAnswer === optionIndex ? "default" : "outline"}
-                                        size="sm"
-                                        onClick={() =>
-                                          handleUpdateQuizQuestion(questionIndex, "correctAnswer", optionIndex)
-                                        }
-                                        className="text-xs whitespace-nowrap"
+                                  <Label className="text-sm">
+                                    Answer Options
+                                  </Label>
+                                  {question.options.map(
+                                    (option, optionIndex) => (
+                                      <div
+                                        key={optionIndex}
+                                        className="flex items-center space-x-2"
                                       >
-                                        Correct
-                                      </Button>
-                                    </div>
-                                  ))}
+                                        <Input
+                                          value={option}
+                                          onChange={(e) => {
+                                            const newOptions = [
+                                              ...question.options,
+                                            ];
+                                            newOptions[optionIndex] =
+                                              e.target.value;
+                                            handleUpdateQuizQuestion(
+                                              questionIndex,
+                                              "options",
+                                              newOptions
+                                            );
+                                          }}
+                                          placeholder={`Option ${
+                                            optionIndex + 1
+                                          }`}
+                                          className="text-sm"
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant={
+                                            question.correctAnswer ===
+                                            optionIndex
+                                              ? "default"
+                                              : "outline"
+                                          }
+                                          size="sm"
+                                          onClick={() =>
+                                            handleUpdateQuizQuestion(
+                                              questionIndex,
+                                              "correctAnswer",
+                                              optionIndex
+                                            )
+                                          }
+                                          className="text-xs whitespace-nowrap"
+                                        >
+                                          Correct
+                                        </Button>
+                                      </div>
+                                    )
+                                  )}
                                 </div>
 
                                 <div className="space-y-2">
@@ -526,7 +695,11 @@ export function AdminCourseManager() {
                                   <Textarea
                                     value={question.explanation}
                                     onChange={(e) =>
-                                      handleUpdateQuizQuestion(questionIndex, "explanation", e.target.value)
+                                      handleUpdateQuizQuestion(
+                                        questionIndex,
+                                        "explanation",
+                                        e.target.value
+                                      )
                                     }
                                     placeholder="Explain why this is the correct answer"
                                     rows={2}
@@ -539,9 +712,15 @@ export function AdminCourseManager() {
                         </div>
                       )}
 
-                      <Button onClick={handleAddLesson} className="w-full text-sm md:text-base">
+                      <Button
+                        onClick={handleAddLesson}
+                        className="w-full text-sm md:text-base"
+                      >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add {newLesson.type === "video" ? "Video Lesson" : "Quiz Lesson"}
+                        Add{" "}
+                        {newLesson.type === "video"
+                          ? "Video Lesson"
+                          : "Quiz Lesson"}
                       </Button>
                     </CardContent>
                   </Card>
@@ -556,7 +735,10 @@ export function AdminCourseManager() {
                       <CardContent>
                         <div className="space-y-2">
                           {newCourse.lessons.map((lesson, index) => (
-                            <div key={lesson.id} className="flex items-center justify-between p-3 border rounded-lg">
+                            <div
+                              key={lesson.id}
+                              className="flex items-center justify-between p-3 border rounded-lg"
+                            >
                               <div className="flex items-center space-x-3">
                                 {lesson.type === "video" ? (
                                   <Video className="h-4 w-4 text-blue-500" />
@@ -564,13 +746,21 @@ export function AdminCourseManager() {
                                   <HelpCircle className="h-4 w-4 text-green-500" />
                                 )}
                                 <div>
-                                  <p className="font-medium text-sm md:text-base">{lesson.title}</p>
+                                  <p className="font-medium text-sm md:text-base">
+                                    {lesson.title}
+                                  </p>
                                   <p className="text-xs md:text-sm text-muted-foreground">
-                                    {lesson.type === "video" ? `Video • ${lesson.duration}` : "Quiz"}
+                                    {lesson.type === "video"
+                                      ? `Video • ${lesson.duration}`
+                                      : "Quiz"}
                                   </p>
                                 </div>
                               </div>
-                              <Button variant="outline" size="sm" onClick={() => handleRemoveLesson(lesson.id)}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRemoveLesson(lesson.id)}
+                              >
                                 <X className="h-3 w-3" />
                               </Button>
                             </div>
@@ -585,16 +775,24 @@ export function AdminCourseManager() {
               <TabsContent value="preview" className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base md:text-lg">Course Preview</CardTitle>
+                    <CardTitle className="text-base md:text-lg">
+                      Course Preview
+                    </CardTitle>
                     <CardDescription className="text-sm md:text-base">
                       Review your course before publishing
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <h3 className="font-semibold text-base md:text-lg">{newCourse.title || "Course Title"}</h3>
-                      <p className="text-sm text-muted-foreground">by {newCourse.instructor || "Instructor"}</p>
-                      <p className="text-sm md:text-base mt-2">{newCourse.description || "Course description"}</p>
+                      <h3 className="font-semibold text-base md:text-lg">
+                        {newCourse.title || "Course Title"}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        by {newCourse.instructor || "Instructor"}
+                      </p>
+                      <p className="text-sm md:text-base mt-2">
+                        {newCourse.description || "Course description"}
+                      </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary" className="text-xs md:text-sm">
@@ -616,10 +814,17 @@ export function AdminCourseManager() {
             </Tabs>
 
             <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="text-sm md:text-base">
+              <Button
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+                className="text-sm md:text-base"
+              >
                 Cancel
               </Button>
-              <Button onClick={handleAddCourse} className="text-sm md:text-base">
+              <Button
+                onClick={handleAddCourse}
+                className="text-sm md:text-base"
+              >
                 Add Course
               </Button>
             </div>
@@ -631,7 +836,9 @@ export function AdminCourseManager() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base md:text-lg">All Courses</CardTitle>
-          <CardDescription className="text-sm md:text-base">Manage all courses on the platform</CardDescription>
+          <CardDescription className="text-sm md:text-base">
+            Manage all courses on the platform
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -639,7 +846,9 @@ export function AdminCourseManager() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xs md:text-sm">Course</TableHead>
-                  <TableHead className="text-xs md:text-sm">Instructor</TableHead>
+                  <TableHead className="text-xs md:text-sm">
+                    Instructor
+                  </TableHead>
                   <TableHead className="text-xs md:text-sm">Level</TableHead>
                   <TableHead className="text-xs md:text-sm">Price</TableHead>
                   <TableHead className="text-xs md:text-sm">Students</TableHead>
@@ -647,17 +856,21 @@ export function AdminCourseManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {courses.map((course) => (
+                {courses&&courses.map((course) => (
                   <TableRow key={course.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium text-xs md:text-sm">{course.title}</div>
+                        <div className="font-medium text-xs md:text-sm">
+                          {course.title}
+                        </div>
                         <div className="text-xs text-muted-foreground line-clamp-1 md:block hidden">
                           {course.description}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs md:text-sm">{course.instructor}</TableCell>
+                    <TableCell className="text-xs md:text-sm">
+                      {course.instructor}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary" className="text-xs">
                         {course.level}
@@ -677,10 +890,18 @@ export function AdminCourseManager() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-1">
-                        <Button size="sm" variant="outline" onClick={() => handleEditCourse(course)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditCourse(course)}
+                        >
                           <Edit className="h-3 w-3" />
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDeleteCourse(course.id)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDeleteCourse(course.id)}
+                        >
                           <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
@@ -694,7 +915,10 @@ export function AdminCourseManager() {
       </Card>
 
       {/* Edit Course Dialog */}
-      <Dialog open={!!editingCourse} onOpenChange={() => setEditingCourse(null)}>
+      <Dialog
+        open={!!editingCourse}
+        onOpenChange={() => setEditingCourse(null)}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Edit Course</DialogTitle>
@@ -707,7 +931,9 @@ export function AdminCourseManager() {
                 <Input
                   id="edit-title"
                   value={newCourse.title}
-                  onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, title: e.target.value })
+                  }
                   placeholder="Enter course title"
                 />
               </div>
@@ -716,7 +942,9 @@ export function AdminCourseManager() {
                 <Input
                   id="edit-instructor"
                   value={newCourse.instructor}
-                  onChange={(e) => setNewCourse({ ...newCourse, instructor: e.target.value })}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, instructor: e.target.value })
+                  }
                   placeholder="Enter instructor name"
                 />
               </div>
@@ -726,7 +954,9 @@ export function AdminCourseManager() {
               <Textarea
                 id="edit-description"
                 value={newCourse.description}
-                onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+                onChange={(e) =>
+                  setNewCourse({ ...newCourse, description: e.target.value })
+                }
                 placeholder="Enter course description"
                 rows={3}
               />
@@ -736,7 +966,9 @@ export function AdminCourseManager() {
                 <Label htmlFor="edit-level">Level</Label>
                 <Select
                   value={newCourse.level}
-                  onValueChange={(value: any) => setNewCourse({ ...newCourse, level: value })}
+                  onValueChange={(value: any) =>
+                    setNewCourse({ ...newCourse, level: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -754,7 +986,12 @@ export function AdminCourseManager() {
                   id="edit-price"
                   type="number"
                   value={newCourse.price}
-                  onChange={(e) => setNewCourse({ ...newCourse, price: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setNewCourse({
+                      ...newCourse,
+                      price: Number(e.target.value),
+                    })
+                  }
                   placeholder="0"
                 />
               </div>
@@ -763,7 +1000,9 @@ export function AdminCourseManager() {
                 <Input
                   id="edit-duration"
                   value={newCourse.duration}
-                  onChange={(e) => setNewCourse({ ...newCourse, duration: e.target.value })}
+                  onChange={(e) =>
+                    setNewCourse({ ...newCourse, duration: e.target.value })
+                  }
                   placeholder="e.g., 8 hours"
                 />
               </div>
@@ -778,5 +1017,5 @@ export function AdminCourseManager() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

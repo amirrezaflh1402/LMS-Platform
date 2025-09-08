@@ -10,40 +10,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { mockUsers } from "@/lib/mock-data"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
 
-    // Mock login - simulate API call
-    setTimeout(() => {
-      let userData
-      if (email === "admin@admin.com" && password === "1234") {
-        userData = mockUsers.find((user) => user.email === "admin@admin.com") || {
-          id: "admin",
-          name: "Admin User",
-          email: "admin@admin.com",
-          role: "admin",
-        }
-      } else {
-        // Find user in mock data or create default student
-        userData = mockUsers.find((user) => user.email === email) || {
-          id: "1",
-          name: "John Doe",
-          email: email,
-          role: "student",
-        }
+    try {
+      const res = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        throw new Error("Invalid credentials")
       }
-
-      // Store user data
-      localStorage.setItem("user", JSON.stringify(userData))
+      const userData = await res.json()
+      localStorage.setItem("token", userData.token)
       setIsLoading(false)
 
       if (userData.role === "admin") {
@@ -51,7 +42,10 @@ export default function LoginPage() {
       } else {
         router.push("/dashboard")
       }
-    }, 1000)
+    } catch (err: any) {
+      setError(err.message || "Login failed")
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleLogin = () => {
@@ -100,6 +94,9 @@ export default function LoginPage() {
                 required
               />
             </div>
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>

@@ -7,16 +7,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { mockCourses } from "@/lib/mock-data"
 import { Clock, Users, Star, BookOpen } from "lucide-react"
 import { UserDropdown } from "@/components/user-dropdown"
 import { Breadcrumb } from "@/components/breadcrumb"
+import { useEffect } from "react"
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [levelFilter, setLevelFilter] = useState("all")
+  const [courses, setCourses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredCourses = mockCourses.filter((course) => {
+  useEffect(() => {
+    setLoading(true)
+    setError(null)
+    fetch("/api/courses")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch courses")
+        return res.json()
+      })
+      .then((data) => setCourses(data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
+  const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -48,7 +63,7 @@ export default function CoursesPage() {
         </div>
       </header>
 
-      <Breadcrumb />
+      {/* <Breadcrumb /> */}
 
       <div className="container mx-auto px-4 py-6 md:py-8">
         {/* Page Header */}
